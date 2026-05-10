@@ -1,0 +1,12 @@
+__pycache__
+*.py[cod]
+*.egg-info
+venv
+.venv
+.env
+*.db
+*.db-shm
+*.db-wal
+tests
+conftest.py
+.pytest_cache
