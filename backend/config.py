@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv(override=True)
+# 不用 override：生产环境变量优先，.env 只补充缺失项
+load_dotenv()
 
 MIMO_API_KEY = os.getenv("MIMO_API_KEY", "")
 MIMO_MODEL = os.getenv("MIMO_MODEL", "mimo-v2.5-pro")

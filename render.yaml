@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: learnpilot-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: MIMO_API_KEY
+        sync: false
+      - key: MIMO_MODEL
+        value: mimo-v2.5-pro
+      - key: MIMO_BASE_URL
+        value: https://token-plan-cn.xiaomimimo.com/v1
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /var/data/learnpilot.db
+      - key: CORS_ORIGINS
+        sync: false
+    disk:
+      name: learnpilot-db
+      mountPath: /var/data
+      sizeGB: 1

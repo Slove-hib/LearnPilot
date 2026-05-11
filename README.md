@@ -167,6 +167,35 @@ docker compose up -d --build
 
 访问 http://localhost
 
+### 方式三：线上部署（Vercel + Render）
+
+**后端部署到 Render：**
+
+1. 在 [Render](https://render.com) 创建账号
+2. New → Web Service → Connect GitHub 仓库
+3. 选择 Docker 环境，设置：
+   - Dockerfile 路径：`backend/Dockerfile`
+   - Docker Context：`backend`
+4. 添加环境变量：
+   - `MIMO_API_KEY` — 你的 API Key
+   - `MIMO_MODEL` — `mimo-v2.5-pro`
+   - `MIMO_BASE_URL` — `https://token-plan-cn.xiaomimimo.com/v1`
+   - `JWT_SECRET_KEY` — 随机强密码
+   - `CORS_ORIGINS` — 你的 Vercel 前端域名（如 `https://xxx.vercel.app`）
+5. 添加 Persistent Disk（1GB，挂载到 `/var/data`）
+6. 部署完成后记录后端 URL（如 `https://learnpilot.onrender.com`）
+
+**前端部署到 Vercel：**
+
+1. 在 [Vercel](https://vercel.com) 创建账号
+2. Import GitHub 仓库，设置：
+   - Framework Preset：Vite
+   - Root Directory：`frontend`
+3. 部署完成
+4. 访问 Vercel 域名即可使用
+
+> `frontend/vercel.json` 已配置 API 代理，自动将 `/api/*` 请求转发到 Render 后端。
+
 ### 环境变量
 
 ```env
