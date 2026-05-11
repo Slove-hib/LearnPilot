@@ -67,9 +67,8 @@
 - **用户认证** — 注册 / 登录，JWT Token，数据隔离
 - **智能规划** — 创建目标后 AI 自动生成分阶段学习计划
 - **动态调整** — 根据进度和反馈，AI 重新规划未完成任务
-- **学习辅导** — SSE 流式对话，基于任务上下文的针对性答疑
+- **学习辅导** — AI 对话，基于任务上下文的针对性答疑
 - **进度追踪** — 任务状态管理（待办 / 进行中 / 已完成），统计仪表盘
-- **数据导出** — Markdown 学习报告 + JSON 全量备份
 - **后端健壮** — API 调用重试、AI 接口限流（20 次/分钟）、结构化日志
 - **容器化部署** — Docker Compose 一键启动
 
@@ -169,6 +168,8 @@ docker compose up -d --build
 
 ### 方式三：线上部署（Vercel + Render）
 
+> **适用场景：** 个人 Demo / 作品集展示。当前使用 SQLite 作为数据库，Render 免费版的文件系统**不保证持久化**，每次重新部署可能导致数据丢失。如需多人长期使用，建议迁移至 PostgreSQL。
+
 **后端部署到 Render：**
 
 1. 在 [Render](https://render.com) 创建账号
@@ -180,10 +181,9 @@ docker compose up -d --build
    - `MIMO_API_KEY` — 你的 API Key
    - `MIMO_MODEL` — `mimo-v2.5-pro`
    - `MIMO_BASE_URL` — `https://token-plan-cn.xiaomimimo.com/v1`
-   - `JWT_SECRET_KEY` — 随机强密码
+   - `JWT_SECRET_KEY` — 随机强密码（Render 可自动生成）
    - `CORS_ORIGINS` — 你的 Vercel 前端域名（如 `https://xxx.vercel.app`）
-5. 添加 Persistent Disk（1GB，挂载到 `/var/data`）
-6. 部署完成后记录后端 URL（如 `https://learnpilot.onrender.com`）
+5. 部署完成后记录后端 URL（如 `https://your-app.onrender.com`）
 
 **前端部署到 Vercel：**
 
@@ -191,10 +191,10 @@ docker compose up -d --build
 2. Import GitHub 仓库，设置：
    - Framework Preset：Vite
    - Root Directory：`frontend`
-3. 部署完成
-4. 访问 Vercel 域名即可使用
+3. 修改 `frontend/vercel.json`，将 `destination` 中的 `YOUR_RENDER_URL` 替换为你的 Render 后端地址
+4. 部署完成，访问 Vercel 域名即可使用
 
-> `frontend/vercel.json` 已配置 API 代理，自动将 `/api/*` 请求转发到 Render 后端。
+> `frontend/vercel.json` 配置了 API 代理，将 `/api/*` 请求转发到 Render 后端。部署前需替换其中的后端 URL。
 
 ### 环境变量
 
@@ -241,7 +241,7 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 | Plans | `/plan` | 目标列表 |
 | Plan View | `/plan/:goalId` | 计划展示、任务状态切换、AI 调整计划 |
 | Tasks | `/tasks` | 任务列表、按目标/日期筛选、状态修改 |
-| Chat | `/chat` | SSE 流式对话、Markdown 渲染、代码高亮 |
+| Chat | `/chat` | AI 对话、Markdown 渲染、代码高亮 |
 
 ## 项目结构
 
@@ -293,15 +293,28 @@ python -m pytest tests/ -v
 - 移动端适配（响应式 / PWA）
 - Agent 执行日志可视化（展示 Agent 思考过程）
 
+## 线上部署验证清单
+
+部署完成后，逐项验证：
+
+- [ ] Vercel 前端域名可访问，页面正常渲染
+- [ ] 注册新用户，返回 JWT Token
+- [ ] 登录后跳转 Dashboard，统计卡片正常显示
+- [ ] 创建学习目标，Planner Agent 返回分阶段计划
+- [ ] Plan 页面展示阶段和任务列表
+- [ ] 标记任务完成，状态更新成功
+- [ ] Chat 页面输入问题，AI 返回回答
+- [ ] 未登录访问受保护页面，跳转到登录页
+
 ## 简历描述
 
 **简洁版：**
 
-> 基于 MiMo API 的多 Agent 学习规划系统。Planner / Adjuster / Tutor 三个 Agent 协作，实现自动规划、动态调整、上下文辅导。React + FastAPI 全栈，JWT 认证、SSE 流式、Docker 部署。
+> 基于 MiMo API 的多 Agent 学习规划系统。Planner / Adjuster / Tutor 三个 Agent 协作，实现自动规划、动态调整、上下文辅导。React + FastAPI 全栈，JWT 认证、Docker 部署。
 
 **详细版：**
 
-> 设计并实现了一个 AI Agent 驱动的全栈学习规划系统。核心亮点是多 Agent 协作架构：Planner Agent 解析学习目标并生成分阶段计划；Adjuster Agent 根据用户反馈和实际进度动态调整任务；Tutor Agent 基于当前学习上下文提供针对性辅导并推荐资源。三个 Agent 通过结构化 JSON 通信，后端统一校验和持久化。前端 React + TypeScript + Tailwind（8 个页面），后端 FastAPI + SQLite（16 个 API），支持 JWT 认证、SSE 流式对话、数据导出、接口限流、Docker 部署，25 个自动化测试。
+> 设计并实现了一个 AI Agent 驱动的全栈学习规划系统。核心亮点是多 Agent 协作架构：Planner Agent 解析学习目标并生成分阶段计划；Adjuster Agent 根据用户反馈和实际进度动态调整任务；Tutor Agent 基于当前学习上下文提供针对性辅导。三个 Agent 通过结构化 JSON 通信，后端统一校验和持久化。前端 React + TypeScript + Tailwind，后端 FastAPI + SQLite，支持 JWT 认证、接口限流、Docker 部署，25 个自动化测试。
 
 ---
 

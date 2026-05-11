@@ -1,3 +1,6 @@
+# Render 部署配置（免费版）
+# 注意：免费版文件系统不持久化，每次重新部署 SQLite 数据会丢失
+# 如需持久化，升级付费计划并添加 disk 配置
 services:
   - type: web
     name: learnpilot-backend
@@ -14,10 +17,6 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: DATABASE_PATH
-        value: /var/data/learnpilot.db
+        value: learnpilot.db
       - key: CORS_ORIGINS
         sync: false
-    disk:
-      name: learnpilot-db
-      mountPath: /var/data
-      sizeGB: 1
